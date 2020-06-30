@@ -1,6 +1,6 @@
 import random
 
-def get_all_colors(classes, seed=2):
+def get_all_colors(classes, seed=1):
     class_colors = {}
     random.seed(seed)
     for cls in classes:

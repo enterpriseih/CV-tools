@@ -4,7 +4,7 @@ import shutil
 import xml.etree.ElementTree as ET
 import traceback
 
-CLASSES = ['face', 'face_mask']
+CLASSES = ['face', 'part_face', 'bow_face', 'up_face', 'chair', 'glasses', 'side_face']
 XML_DIR = './voc/Annotations/'
 JPEG_DIR = './voc/JPEGImages/'
 LABEL_DIR = './yolo/biaozhu'
@@ -31,6 +31,13 @@ def parse_xml(fname):
         ymin = float(bndbox_anno.find('ymin').text)
         xmax = float(bndbox_anno.find('xmax').text)
         ymax = float(bndbox_anno.find('ymax').text)
+
+
+        if xmin < 0: xmin = 0
+        if ymin < 0: ymin = 0
+        if xmax >width: xmax = width
+        if ymax > height: ymax = height
+
         class_name = obj.find('name').text.lower().strip()
 
         annos.append((class_name, xmin, ymin, xmax, ymax, width, height))
@@ -51,6 +58,7 @@ def gen_txt(fname, annos):
             f.write(' '.join((str(cls), '%3f'%xmid, '%3f'%ymid, '%3f'%w, '%3f'%h)) + '\n')
         except:
             print(fname)
+            traceback.print_exc()
     f.close()
         
 if __name__ == '__main__':

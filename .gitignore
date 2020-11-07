@@ -4,6 +4,13 @@ __pycache__/
 *$py.class
 *.idea
 *.jpg
+*.zip
+*.gz
+*.rar
+*.tar
+*.7z
+output
+outputs
 
 # C extensions
 *.so

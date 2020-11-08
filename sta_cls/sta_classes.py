@@ -3,24 +3,20 @@ import cv2
 import shutil
 import xml.etree.ElementTree as ET
 import traceback
+import argparse
 
-XML_DIR = './voc/Annotations/'
+
+parser = argparse.ArgumentParser(description='Simple training script for training a RetinaNet network.')
+parser.add_argument('--voc-path', default='./configs/mouse.yml', help='project file')
+args = parser.parse_args()
 
 
 def parse_xml(fname):
     xml_anno = ET.parse(fname)
 
-    try:
-        obj = xml_anno.find('size')
-        width = float(obj.find('width').text)
-        height = float(obj.find('height').text)
-
-        if width < 10 or height < 10:
-            img = cv2.imread(os.path.join(JPEG_DIR, fname.replace('.xml', '.jpg')))
-            height, width, channel = img.shape
-    except:
-        img = cv2.imread(os.path.join(JPEG_DIR, fname.replace('.xml', '.jpg')))
-        height, width, channel = img.shape
+    obj = xml_anno.find('size')
+    width = float(obj.find('width').text)
+    height = float(obj.find('height').text)
 
     for obj in xml_anno.findall('object'):
         #class_name = obj.find('name').text.lower().strip()
@@ -30,9 +26,11 @@ def parse_xml(fname):
 
 if __name__ == '__main__':
     clses = set()
-    for f in os.listdir(XML_DIR):
+    xml = os.path.join(args.voc_path, 'Annotations')
+    for f in os.listdir(xml):
         try:
-            clses.add(parse_xml(os.path.join(XML_DIR, f)))
+            clses.add(parse_xml(os.path.join(xml, f)))
         except:
             traceback.print_exc()
     print(clses)
+    print('Total classes is:{}'.format(len(clses)))

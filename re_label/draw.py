@@ -1,14 +1,16 @@
 import os
 import cv2
 import json
+import argparse
 from collections import defaultdict
 import xml.etree.ElementTree as ET
 
-BIAOZHU = './Annotations'
-#BIAOZHU = './json'
-OUTPUT = './output'
-INPUT = './JPEGImages'
-COLOR = [(0, 0, 255), (0, 255, 0)]
+
+parser = argparse.ArgumentParser(description='Simple training script for training a RetinaNet network.')
+parser.add_argument('--voc-path', default='./', help='voc data path')
+parser.add_argument('--output-path', default='./outputs', help='voc data path')
+args = parser.parse_args()
+
 
 def parse_single_xml(xml_path):
     """处理单个voc anno文件，获得对应的标注坐标、类别标签"""
@@ -24,7 +26,7 @@ def parse_single_xml(xml_path):
         class_name = obj.find('name').text.lower().strip()
         
         annos.append((xmin, ymin, xmax, ymax, class_name))
-        
+
     return annos
 
 def parse_single_json(json_path):
@@ -46,11 +48,13 @@ def parse_single_json(json_path):
     return annos
 
 def main():
+    BIAOZHU = os.path.join(args.voc_path, './Annotations')
+    INPUT = os.path.join(args.voc_path, './JPEGImages')
+    os.makedirs(args.output_path, exist_ok=True)
     for x in os.listdir(BIAOZHU):
         xml_path = os.path.join(BIAOZHU, x)
         annos = parse_single_xml(xml_path)
-        #annos = parse_single_json(xml_path)
-        
+
         prefix = x[:-4]
         jpg_path = os.path.join(INPUT, prefix + '.jpg')
         im = cv2.imread(jpg_path)
@@ -61,9 +65,7 @@ def main():
             cv2.rectangle(im, (anno[0], anno[1]), (anno[2], anno[3]), (0, 255, 0), thickness=1)
             cv2.putText(im, text, (anno[0], anno[3]), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,255,0), 2)
 
-
-        #print(prefix)
-        cv2.imwrite(os.path.join(OUTPUT, prefix+'.jpg'), im)
+        cv2.imwrite(os.path.join(args.output_path, prefix+'.jpg'), im)
 
 if __name__ == '__main__':
     main()

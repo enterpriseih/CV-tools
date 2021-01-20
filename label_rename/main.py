@@ -25,8 +25,8 @@ def label_rename(input_xml, output_xml):
     for child in root:
         if child.tag == 'object':
             for sub in child:
-                if sub.tag in DST_CLS:
-                    sub.text = DST_CLS[sub.tag]
+                if sub.tag == 'name':
+                    sub.text = DST_CLS[sub.text]
 
     tree.write(output_xml)
 

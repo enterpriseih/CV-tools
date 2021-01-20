@@ -5,6 +5,7 @@ import traceback
 import xml.etree.ElementTree as ET
 import xml.dom.minidom
 import cv2
+import shutil
 
 
 parser = argparse.ArgumentParser(description='Simple training script for training a RetinaNet network.')
@@ -26,7 +27,7 @@ def extract_label(input_xml, output_xml):
         if obj.find('name').text not in DST_CLS:
             root.remove(obj)
 
-    if 0 == len(tree.findall('object')) > 0:
+    if len(tree.findall('object')) > 0:
         xml_str = xml.dom.minidom.parseString(ET.tostring(root)).toprettyxml()
         xml_str = os.linesep.join([s for s in xml_str.splitlines() if s.strip()])
         xml_str = xml_str.split('\n', maxsplit=1)[1]
@@ -46,3 +47,7 @@ if __name__ == '__main__':
             extract_label(os.path.join(args.inputs, 'Annotations', f), os.path.join(args.outputs, 'Annotations', f))
         except:
             traceback.print_exc()
+
+    for f in os.listdir(os.path.join(args.outputs, 'Annotations')):
+        img_name = f.replace('xml', 'jpg')
+        shutil.copy(os.path.join(args.inputs, 'JPEGImages', img_name), os.path.join(args.outputs, 'JPEGImages', img_name))
